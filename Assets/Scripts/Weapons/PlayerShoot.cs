@@ -6,9 +6,15 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float fireRate = 0.2f;
     //[SerializeField] private int bulletsQuantity = 10;  
+    [SerializeField] private int manaCostPerShoot = 5;
 
+    private Mana mana;
     private float nextFireTime;
-    
+
+    private void Awake()
+    {
+        mana = GetComponent<Mana>();
+    }
 
     private void Update()
     {
@@ -16,8 +22,11 @@ public class PlayerShoot : MonoBehaviour
 
         if (isHolding && Time.time >= nextFireTime)
         {
-            FireBullet();
-            nextFireTime = Time.time + fireRate;
+            if(mana == null || mana.TryUse(manaCostPerShoot))
+            {
+                FireBullet();
+                nextFireTime = Time.time + fireRate;
+            }
         }
     }
 

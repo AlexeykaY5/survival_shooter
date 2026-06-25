@@ -1,6 +1,9 @@
-using UnityEngine;
+using System;
 
-public class IResource
+public interface IResource
 {
-    
+    int Current {  get; }
+    int Max { get; }
+
+    event Action<int, int> OnChanged;
 }

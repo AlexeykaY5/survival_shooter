@@ -1,24 +1,39 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour, IDamageable
+public class Health : MonoBehaviour, IDamageable, IResource
 {
     [SerializeField] private int maxHealth = 100;
 
-    public event Action<int, int> OnHealthChange; 
     public event Action OnDied;
     private int currentHealth;
+    public int Current => currentHealth;
+    public int Max => maxHealth;
+    public event Action<int, int> OnChanged;
+
 
     private void Awake()
     {
         currentHealth = maxHealth;
-        OnHealthChange?.Invoke(currentHealth, maxHealth);
+        OnChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        OnHealthChange?.Invoke(currentHealth, maxHealth);
+        if (TryGetComponent<EnergyShield>(out var energyShield))
+        {
+            damage = energyShield.Absorb(damage);
+        }
+
+        if (damage > 0)
+        {
+            currentHealth -= damage;
+            OnChanged?.Invoke(currentHealth, maxHealth);
+        }else if(damage <= 0)
+        {
+            return;
+        }
+
 
         if (currentHealth <= 0)
         {
